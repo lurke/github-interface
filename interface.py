@@ -24,25 +24,24 @@ def load_pull_requests():
         global pull_requests
         pull_requests = pickle.load(cache_file)
     time_since_modified = time.time() - os.path.getmtime(CACHE_FILENAME)
-    print(len(pull_requests))
 
     # check how many pull requests exist
-    # first_response = requests.head(GITHUB_REPO_URL, params=params, headers=headers)
-    # if first_response.status_code == 403:
-    #     print("Github rate limit exceeded. Using cached file instead.")
-    #     return
-    # last_page_url = first_response.links['last']['url']
-    # last_page = int(urlparse.parse_qs(last_page_url)['page'][0])
-    # params['page'] = last_page
-    # last_response = requests.get(GITHUB_REPO_URL, params=params, headers=headers)
-    # num_pulls = (last_page-1) * PULLS_PER_PAGE + len(last_response.json())
-    #
-    # # if there are new pull requests or if cache is more than a day old, query for pull requests and update cache
-    # if num_pulls > len(pull_requests) or time_since_modified > 86400:
-    #     # TODO do we need global here?
-    #     pull_requests = query_pull_requests(last_page)
-    #     with open(CACHE_FILENAME, 'wb') as cache_file:
-    #         pickle.dump(pull_requests, cache_file)
+    first_response = requests.head(GITHUB_REPO_URL, params=params, headers=headers)
+    if first_response.status_code == 403:
+        print("Github rate limit exceeded. Using cached file instead.")
+        return
+    last_page_url = first_response.links['last']['url']
+    last_page = int(urlparse.parse_qs(last_page_url)['page'][0])
+    params['page'] = last_page
+    last_response = requests.get(GITHUB_REPO_URL, params=params, headers=headers)
+    num_pulls = (last_page-1) * PULLS_PER_PAGE + len(last_response.json())
+
+    # if there are new pull requests or if cache is more than a day old, query for pull requests and update cache
+    if num_pulls > len(pull_requests) or time_since_modified > 86400:
+        # TODO do we need global here?
+        pull_requests = query_pull_requests(last_page)
+        with open(CACHE_FILENAME, 'wb') as cache_file:
+            pickle.dump(pull_requests, cache_file)
 
 def query_pull_requests(last_page):
     pulls = []
@@ -56,11 +55,8 @@ def query_pull_requests(last_page):
 
 @app.route("/pulls/")
 def get_pull_requests() :
-    print(len(pull_requests))
     start_index = flask_request.args.get('start')
     end_index = flask_request.args.get('end')
-    print(start_index)
-    print(end_index)
 
     # handle start and end params
     if not start_index: start_index = 0
@@ -74,13 +70,10 @@ def get_pull_requests() :
     if end_index - start_index > 30:
         abort(400, "You may only request a maximum of 30 requests at a time.")
 
-    print(len(pull_requests))
-
-    print(pull_requests[start_index:end_index])
     return json.jsonify(pull_requests[start_index:end_index])
 
+# initiate app by loading pull requests
+load_pull_requests()
+
 if __name__ == '__main__':
-    load_pull_requests()
-    print(len(pull_requests))
-    get_pull_requests()
     app.run()
