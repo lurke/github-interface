@@ -1,6 +1,7 @@
 import os
 import requests
 import pickle
+import math
 import urllib.parse as urlparse
 from flask import Flask, json, abort
 from flask import request as flask_request
@@ -53,24 +54,24 @@ def query_pull_requests(last_page):
         page += 1
     return pulls
 
+@app.route("/pulls/pages")
+def get_pulls_pages():
+    return str(math.ceil(len(pull_requests)/PULLS_PER_PAGE))
+
 @app.route("/pulls/")
 def get_pull_requests() :
-    start_index = flask_request.args.get('start')
-    end_index = flask_request.args.get('end')
+    page = int(flask_request.args.get('page'))
+    if not page >= 1:
+        abort(400, "Page param must be 1 or greater.")
 
-    # handle start and end params
-    if not start_index: start_index = 0
-    if not end_index: end_index = 30
-    if not start_index >= 0:
-        abort(400, "Start param must be positive.")
-    if not end_index >= 0:
-        abort(400, "End param must be positive.")
-    if end_index < start_index:
-        abort(400, "End param must be greater than start param.")
-    if end_index - start_index > 30:
-        abort(400, "You may only request a maximum of 30 requests at a time.")
+    max_page = math.ceil(len(pull_requests)/PULLS_PER_PAGE)
+    if page > max_page:
+        abort(400, "Page param must be less than " + max_page + ".")
 
-    return json.jsonify(pull_requests[start_index:end_index])
+    start = (page-1)*PULLS_PER_PAGE
+    end = min(len(pull_requests), start+PULLS_PER_PAGE)
+    return json.jsonify(pull_requests[start:end])
+
 
 # initiate app by loading pull requests
 load_pull_requests()
