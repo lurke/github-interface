@@ -1,0 +1,35 @@
+.pullLi{
+  list-style: none;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  margin:5px;
+  padding:5px;
+}
+
+.pullNum{
+  display:inline-block;
+  font-size: 1.5em;
+  font-style: bold;
+  margin-right:10px;
+}
+.pullNum a:hover{
+  color:#1d4c77
+}
+.pullTitle{
+  display: inline-block;
+}
+.pullTitle a {
+  color:#01b287 !important
+}
+.pullTitle a:hover{
+  color:#008464
+}
+
+.loadMore{
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  position:relative;
+  left:calc(50% - 40px)
+}

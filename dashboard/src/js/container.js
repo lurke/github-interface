@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Tab from './tab';
-import PullRequests from './pullRequests';
+import PullRequestList from './pullRequestList';
 import TabContent from './tabContent';
 
 class Container extends Component {
@@ -25,7 +25,7 @@ class Container extends Component {
           <Tab name="other" displayName="Other data" active={this.state.activeTab === 'other' ? "active" : ""} handleTabClick={this.handleTabClick.bind(this)} />
         </ul>
         <div className="viewContainer">
-          <PullRequests className="PullRequests" active={this.state.activeTab === 'pulls' ? "active" : "inactive"} />
+          <PullRequestList className="PullRequestList" active={this.state.activeTab === 'pulls' ? "active" : "inactive"} />
           <TabContent className="TabContent" active={this.state.activeTab === 'other' ? "active" : "inactive"} />
         </div>
       </div>
