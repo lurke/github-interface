@@ -2,14 +2,15 @@ import os
 import requests
 import pickle
 import math
+import time
+import arrow
 import urllib.parse as urlparse
 from flask import Flask, json, abort
 from flask import request as flask_request
 from flask_cors import CORS
 
-import time
 
-# initiate flask application
+# initiate flask application, with CORS for local deployments because of cross origin requests between localhosts
 app = Flask(__name__)
 CORS(app)
 
@@ -22,6 +23,12 @@ headers = {'User-Agent': 'Lauren Urke'}
 pull_requests = []
 
 def load_pull_requests():
+    """
+    Function that determines whether to use cached pull requests of query github.
+    Currently uses cache if the number of pull requests is unchanged and the cache is less than a day old.
+    :return: None, saves pull requests in globals instead
+    """
+
     # load cache
     with open(CACHE_FILENAME, 'rb') as cache_file:
         global pull_requests
@@ -41,27 +48,51 @@ def load_pull_requests():
 
     # if there are new pull requests or if cache is more than a day old, query for pull requests and update cache
     if num_pulls > len(pull_requests) or time_since_modified > 86400:
-        # TODO do we need global here?
         pull_requests = query_pull_requests(last_page)
+        # if we reached the rate limit while asking for pulls, abort and use cache instead
+        if not pull_requests:
+            print("Github rate limit exceeded while querying for new set of pull requests. Using cached file instead.")
+            return
         with open(CACHE_FILENAME, 'wb') as cache_file:
             pickle.dump(pull_requests, cache_file)
+    return
 
 def query_pull_requests(last_page):
+    """
+    Function that queries github for all pull requests
+
+    :param last_page: the total number of pages to ask for
+    :return: the list pull requests
+    """
     pulls = []
     page = 1   # pages are 1 indexed
+    reached_rate_limit = False
     while page <= last_page:
         params['page'] = page
         response = requests.get(GITHUB_REPO_URL, params=params, headers=headers)
+        # if we reached the rate limit, lets use the cache instead
+        if response.status_code == 403:
+            reached_rate_limit = True
+            break
         pulls.extend(response.json())
         page += 1
+    if reached_rate_limit: return None
     return pulls
 
 @app.route("/pulls/pages/", methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_pulls_pages():
+    """
+    An api call that returns the total number of pages the ui will need to request.
+    :return: A number of pages
+    """
     return str(math.ceil(len(pull_requests)/PULLS_PER_PAGE))
 
 @app.route("/pulls/", methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_pull_requests() :
+    """
+    An api call that returns the pull requests for the page requested.
+    :return: A list of pull request json objects
+    """
     page = int(flask_request.args.get('page'))
     if not page >= 1:
         abort(400, "Page param must be 1 or greater.")
@@ -79,4 +110,5 @@ def get_pull_requests() :
 load_pull_requests()
 
 if __name__ == '__main__':
+    # run the flask app
     app.run()
