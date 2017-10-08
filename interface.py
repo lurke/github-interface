@@ -5,7 +5,7 @@ import math
 import urllib.parse as urlparse
 from flask import Flask, json, abort
 from flask import request as flask_request
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 import time
 
@@ -56,13 +56,11 @@ def query_pull_requests(last_page):
         page += 1
     return pulls
 
-@app.route("/pulls/pages")
-@cross_origin()
+@app.route("/pulls/pages/", methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_pulls_pages():
     return str(math.ceil(len(pull_requests)/PULLS_PER_PAGE))
 
-@app.route("/pulls/")
-@cross_origin()
+@app.route("/pulls/", methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_pull_requests() :
     page = int(flask_request.args.get('page'))
     if not page >= 1:

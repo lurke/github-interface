@@ -21,11 +21,8 @@ class PullRequests extends Component {
       method: 'GET',
       credentials:'same-origin',
       headers: {
-        'Content-Type': 'text/plain',
+        // 'Content-Type': 'application/json',
         'Accept': 'application/json'
-        // 'Access-Control-Allow-Origin': '*',
-        // 'Access-Control-Allow-Headers': 'Content-Type, Content-Range, Content-Disposition, Content-Description',
-        // 'Access-Control-Allow-Credentials': true
       }
     });
 
