@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PullRequest from './pullRequest';
 import '../css/pullRequest.css';
+import * as Constants from './constants.js';
+
 
 class PullRequestList extends Component {
   constructor(props) {
@@ -19,7 +21,7 @@ class PullRequestList extends Component {
   }
 
   get_total_pages() {
-    var url = 'http://127.0.0.1:5000/pulls/pages/';
+    var url = Constants.FLASK_APP_URL + '/pulls/pages/';
     let promise = window.fetch(url, {
       method: 'GET',
       credentials:'same-origin',
@@ -40,7 +42,7 @@ class PullRequestList extends Component {
     if (this.state.next_page > this.state.total_pages) {
       return;
     }
-    var url = 'http://127.0.0.1:5000/pulls?page=' + this.state.next_page;
+    var url = Constants.FLASK_APP_URL + '/pulls?page=' + this.state.next_page;
     let promise = window.fetch(url, {
       method: 'GET',
       credentials:'same-origin',
