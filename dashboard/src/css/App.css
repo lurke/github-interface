@@ -1,0 +1,48 @@
+.App {
+}
+
+.App-header {
+  background-color: #ffffff;
+  height: 80px;
+  color: #0a233a;
+  text-align: center;
+}
+
+.App-title {
+  font-size: 3em;
+  font-weight:bold;
+  margin-top:20px;
+}
+
+.content{
+  padding:20px;
+}
+
+.content ul li.active a {
+  background-color: #0a233a;
+  color: #fff;
+  border-color: #0a233a;
+}
+.content ul li.active a:hover {
+  background-color: #0a233a;
+  color: #fff;
+  border-color: #0a233a;
+}
+
+.content ul li a{
+  color:#0a233a;
+}
+
+.content ul.nav-tabs {
+  border-bottom-color:#7d8892;
+}
+
+.contentWrapper{
+  padding:10px;
+}
+.contentWrapper.active{
+  display:inherit;
+}
+.contentWrapper.inactive{
+  display:none;
+}
