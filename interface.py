@@ -79,6 +79,23 @@ def query_pull_requests(last_page):
     if reached_rate_limit: return None
     return pulls
 
+def week_over_week():
+    """
+    Example query for looking at pull requests week over week as in email
+    :return: A list of list of pull requests, where each top level list represents a week
+    """
+    # weeks will be a list of lists, with each list containing the pull requests for that week
+    # week 0 will be this past week, with week 1 the week before, etc
+    weeks = []
+    define_week_since = time.time()      # can change to sunday at midnight if you wish
+    for pull in pull_requests:
+        week_created = int((define_week_since - arrow.get(pull['created_at']).float_timestamp) // 604800)     # 604800 seconds in a week
+        # add empty lists for each week up to this one, if we are seeing a week for the first time
+        if len(weeks) <= week_created: weeks.extend([[] for x in range(week_created + 1 - len(weeks))])
+        weeks[week_created].append(pull)
+    return weeks
+
+
 @app.route("/pulls/pages/", methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_pulls_pages():
     """
@@ -110,5 +127,8 @@ def get_pull_requests() :
 load_pull_requests()
 
 if __name__ == '__main__':
+    # call desired metrics functions
+    # week_over_week()
+
     # run the flask app
     app.run()
