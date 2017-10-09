@@ -17,7 +17,7 @@ To get this project up and running:
    1. Run `export FLASK_APP=interface.py` to set the correct flask app file name
    2. Run `export FLASK_DEBUG=1` to change to debug mode so the code auto refreshes
    3. Run `flask run` to run the application. This should direct you to a url to hit for the basic api. 
-   4. If the url is not `http://127.0.0.1:5000`, go into the `/development/js/constants.js` and update the `FLASK_APP_URL` var to be consistent with the url given to you by the run command.
+   4. If the url is not `http://127.0.0.1:5000`, go into the `/dashboard/js/constants.js` and update the `FLASK_APP_URL` var to be consistent with the url given to you by the run command.
 5. Start the react app, which is located at the `/dashboard` path
   1. Make sure you have npm installed (`brew install npm` if you use homebrew)
   2. cd into the `/github-interface/dashboard` folder
