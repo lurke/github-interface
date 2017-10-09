@@ -96,6 +96,9 @@ def week_over_week():
     return weeks
 
 
+def test_pull_requests_loaded():
+    assert len(pull_requests)
+
 @app.route("/pulls/pages/", methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_pulls_pages():
     """
@@ -129,6 +132,9 @@ load_pull_requests()
 if __name__ == '__main__':
     # call desired metrics functions
     # week_over_week()
+
+    # run simple tests
+    test_pull_requests_loaded()
 
     # run the flask app
     app.run()
